@@ -44,51 +44,51 @@ class BlockChain:                                  # Class named blockchain
                 new_proof += 1                     # Go to nect nonce
             return new_proof            
 
-    def hash(self, block):                         # Function to covert block into JSON and convertinv into SHA256
+    def hash(self, block):                         # Function to covert block into JSON and converting into SHA256
         encode_block = json.dumps(block, sort_keys=True).encode() # Encoding to JSON objects 
         return hashlib.sha256(encode_block).hexdigest()           # Secure hash algorithm 256 converts any data file into 64 character
 
-    def list_valid(self, chain):
-        previous_block = chain[0]  # first block is genisis block
-        block_index = 1
-        while block_index < len(chain):
-            block = chain[block_index]
+    def list_valid(self, chain):                    # to check if the chain is valid or not
+        # idea is to check the current node's hash with next node's previous node for the whole chain, whenver we change the data of one
+        # it's hash value will change and list will be invalid for that node. 
+        previous_block = chain[0]                   # First block is genisis block
+        block_index = 1                             # Block index of the 2nd block
+        while block_index < len(chain):             # If block_index is less then len of chain  
+            block = chain[block_index]              
             if block["previous_hash"] != self.hash(previous_block):
                 return False
             previous_proof = previous_block["proof"]
             proof = block["proof"]
             hash_operation = hashlib.sha256(
                 str(proof ** 2 - previous_proof ** 2).encode()
-            ).hexdigest()
+            ).hexdigest()                           #=======================??????====================
             if hash_operation[:4] != "0000":
                 return False
             block = previous_block
-            block_index += 1
+            block_index += 1                        # Go to the next block
 
 
-# creating a web server
-# creating flask server object
-app = Flask(__name__)
+                                                    # Creating a web server                                                    
+app = Flask(__name__)                               # Creating flask server object
 
-blockChain = BlockChain()
+blockChain = BlockChain()                           # Object of the Class Blockchain
 
 
-@app.route("/mine_block", methods=["GET"])
-def mine_block():
-    previous_block = blockChain.get_previous_block()
+@app.route("/mine_block", methods=["GET"])          # Route is used fot routing the hhtp get request of mine block 
+def mine_block():                                   # Fucntion to mine an block
+    previous_block = blockChain.get_previous_block() 
     previous_proof = previous_block["proof"]
     proof = blockChain.proof_of_work(previous_proof)
     previous_hash = blockChain.hash(previous_block)
-    block = blockChain.create_block(proof, previous_hash)
-    response = {
-        "message": "YOOOO Block mIneDDD",
+    block = blockChain.create_block(proof, previous_hash)   # New block is created with nonce = proof, and previous hash
+    response = {                                            # It's standerd protocol to send respose once sucessfully creation of the block to let know the user
+       "message": "YOOOO Block mIneDDD",
         "index": block["index"],
         "timestamp": block["timestamp"],
         "proof": block["proof"],
         "previous_hash": block["previous_hash"],
     }
-    return jsonify(response), 200  # Sucessfull run code
-
-
-app.run(debug=True, port="5000")
+    return jsonify(response), 200                   # Sucessfull run code  - 200
+                                                    # 404 - Code for not found
+app.run(debug=True, port="5000")                    # Run the App flask server on port 5000
 
