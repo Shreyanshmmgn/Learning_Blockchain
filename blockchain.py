@@ -64,10 +64,9 @@ class BlockChain:                                  # Class named blockchain
             ).hexdigest()                           #=======================??????====================
             if hash_operation[:4] != "0000":
                 return False
-            block = previous_block
+            previous_block = block 
             block_index += 1                        # Go to the next block
-
-
+        return True
                                                     # Creating a web server                                                    
 app = Flask(__name__)                               # Creating flask server object
 
@@ -90,5 +89,24 @@ def mine_block():                                   # Fucntion to mine an block
     }
     return jsonify(response), 200                   # Sucessfull run code  - 200
                                                     # 404 - Code for not found
-app.run(debug=True, port="5000")                    # Run the App flask server on port 5000
 
+@app.route("/show_chain", methods = ["GET"])
+def show_chain():                                   # To show the Block Chain
+    response = {
+        "chain":blockChain.chain,
+        "length": len(blockChain.chain)
+    }
+    return jsonify(response), 200
+
+
+
+@app.route("/is_valid", methods = ["GET"])
+def is_valid():                                      # To check if the list is valid
+    is_valid = blockChain.list_valid(blockChain.chain)
+    if is_valid:
+        response = { "message" : "Chain is valid hurry---"}
+    else:
+        response = { "message" : "Chain is not valid---"}
+    return jsonify(response), 200
+
+app.run(debug=True, port="5000")                    # Run the App flask server on port 5000
