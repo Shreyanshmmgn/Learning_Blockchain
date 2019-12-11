@@ -101,7 +101,7 @@ def show_chain():                                   # To show the Block Chain
 
 
 @app.route("/is_valid", methods = ["GET"])
-def is_valid():                                      # To check if the list is valid
+def is_valid():                                     # To check if the list is valid
     is_valid = blockChain.list_valid(blockChain.chain)
     if is_valid:
         response = { "message" : "Chain is valid hurry---"}
@@ -109,4 +109,4 @@ def is_valid():                                      # To check if the list is v
         response = { "message" : "Chain is not valid---"}
     return jsonify(response), 200
 
-app.run(debug=True, port="5000")                    # Run the App flask server on port 5000
+app.run(debug=True, port="5000")                   # Run the App flask server on port 5000
